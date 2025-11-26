@@ -41,7 +41,7 @@ export async function POST(req: Request) {
   res.cookies.set("token", token, {
     httpOnly: true,
     path: "/",
-    secure: true,
+    secure: process.env.NODE_ENV === "production", // ← FIX TERPENTING
   });
 
   return res;
