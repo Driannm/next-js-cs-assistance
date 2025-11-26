@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation"; // 1. Import useRouter
 import {
   Home,
   CircleUser,
@@ -10,6 +11,7 @@ import {
   Settings,
   Bell,
   UserCog,
+  LogOut, // 2. Import Icon LogOut
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -23,11 +25,13 @@ import {
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const router = useRouter(); // 3. Init Router
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false); // 4. State loading agar tidak double click
 
   const menu = [
     { name: "Dashboard", href: "/dashboard", icon: Home },
-    { name: "Pelanggan", href: "/pelanggan", icon: CircleUser },
+    { name: "Pelanggan", href: "/customer", icon: CircleUser },
     { name: "Order", href: "/order", icon: ReceiptText },
     { name: "Menu", href: "/menu", icon: Soup },
   ];
@@ -37,6 +41,26 @@ export default function BottomNav() {
     { name: "Notifications", href: "/notifications", icon: Bell },
     { name: "Account", href: "/account", icon: UserCog },
   ];
+
+  // 5. Fungsi Handle Logout
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+
+      if (res.ok) {
+        setOpen(false); // Tutup menu
+        router.push("/login"); // Redirect ke login
+        router.refresh(); // Refresh state router
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -58,7 +82,6 @@ export default function BottomNav() {
                     active ? "text-pink-400" : "text-gray-400 hover:text-gray-600"
                   }`}
                 >
-                  {/* Icon size sedikit disesuaikan, stroke width diatur agar tidak terlalu tebal */}
                   <Icon className={`h-6 w-6 transition-transform duration-200 ${active ? "stroke-[2.5px]" : "stroke-2 group-hover:-translate-y-0.5"}`} />
                   <span className="text-[10px] font-medium leading-none">{item.name}</span>
                 </Link>
@@ -81,6 +104,7 @@ export default function BottomNav() {
                 </SheetHeader>
 
                 <div className="grid grid-cols-3 gap-6 mt-8">
+                  {/* Item Menu Lainnya */}
                   {moreMenu.map((item) => {
                     const Icon = item.icon;
                     return (
@@ -97,6 +121,21 @@ export default function BottomNav() {
                       </Link>
                     );
                   })}
+
+                  {/* 6. TOMBOL LOGOUT (Ditambahkan di sini) */}
+                  <button 
+                    onClick={handleLogout}
+                    disabled={loading}
+                    className="flex flex-col items-center group"
+                  >
+                    <div className="bg-red-50 text-red-500 group-hover:bg-red-100 transition-colors w-16 h-16 rounded-2xl flex items-center justify-center mb-2">
+                      <LogOut className="h-7 w-7" />
+                    </div>
+                    <span className="text-xs font-medium text-red-500 group-hover:text-red-600 transition-colors">
+                      {loading ? "Keluar..." : "Logout"}
+                    </span>
+                  </button>
+
                 </div>
               </SheetContent>
             </Sheet>
