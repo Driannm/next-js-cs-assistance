@@ -5,12 +5,11 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" 
+  provider = "postgresql" // atau "sqlite" sesuai setup kamu
   url      = env("DATABASE_URL")
 }
 
-// --- MODEL DATABASE ---
-
+// 1. USER (Untuk Login Admin/Editor)
 model User {
   id        String   @id @default(cuid())
   name      String
@@ -21,18 +20,41 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
+// 2. PACKAGE (Master Data Paket Langganan) - BARU
+model Package {
+  id          String   @id @default(cuid())
+  name        String   // Contoh: "Healthy Slimming", "Muscle Gain"
+  duration    Int      // Total hari dalam paket (misal: 20)
+  description String?  // Detail Paket
+  price       Int?     // Opsional: Harga paket
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  customers   Customer[] // Relasi: Satu paket bisa punya banyak pelanggan
+}
+
+// 3. CUSTOMER (Pelanggan)
 model Customer {
   id             String   @id @default(cuid())
   name           String
   phone          String
   address        String
-  status         String   @default("active")
+  status         String   @default("active") // active, expired, paused
   
-  packageType    String
-  totalDays      Int
-  usedDays       Int      @default(0)
+  // -- Relasi ke Paket Langganan --
+  packageId      String
+  package        Package  @relation(fields: [packageId], references: [id])
+
+  // -- Waktu Langganan --
+  // usedDays dihitung manual via logic aplikasi saat order dibuat
+  usedDays       Int      @default(0) 
   startDate      DateTime @default(now())
-  endDate        DateTime?
+  endDate        DateTime? // Diisi otomatis oleh sistem (startDate + package.duration)
+
+  // -- Preferensi Tambahan (BARU) --
+  preferences    String?  // Contoh: "Nasi ganti kentang", "Kurangi garam"
+  allergies      String?  // Contoh: "Udang", "Kacang"
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -40,17 +62,23 @@ model Customer {
   orders         Order[]
 }
 
+// 4. MENU (Makanan)
 model Menu {
   id          String   @id @default(cuid())
   name        String
-  category    String
+  category    String   
   description String?
   image       String?
+  
+  // -- Nutrisi --
   calories    Int?
   protein     String?
   fat         String?
   carbs       String?
-  ingredients String? 
+  
+  // -- Detail Makanan --
+  ingredients String?  // Bumbu detail (Bawang putih, garam, dll)
+  composition String?  // BARU: Isi utama (Ayam, Kentang, Brokoli)
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -58,6 +86,7 @@ model Menu {
   orders      Order[]
 }
 
+// 5. ORDER (Pesanan Harian)
 model Order {
   id          String   @id @default(cuid())
   date        DateTime
