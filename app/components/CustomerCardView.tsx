@@ -15,7 +15,7 @@ export default function CustomerCardView({
     <div className="space-y-4">
       {customers.map((customer) => {
         const isActive = customer.status === "active";
-        const progressPercent = (customer.usedDays / customer.totalDays) * 100;
+        const progressPercent = (customer.usedDays / customer.package.duration) * 100;
 
         return (
           <div
@@ -69,7 +69,7 @@ export default function CustomerCardView({
                 />
               </div>
               <span className="text-[10px] font-medium text-gray-500">
-                {customer.usedDays}/{customer.totalDays} Hari
+                {customer.usedDays}/{customer.package.duration} Hari
               </span>
             </div>
           </div>

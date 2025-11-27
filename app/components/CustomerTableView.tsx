@@ -49,9 +49,9 @@ export default function CustomerTableView({
                   </div>
                 </td>
                 <td className="px-4 py-3 text-xs text-gray-600">
-                  {customer.packageType}
+                  {customer.package.name}
                   <div className="text-[10px] text-gray-400 mt-0.5">
-                    Sisa {customer.totalDays - customer.usedDays} Hari
+                    Sisa {customer.package.duration - customer.usedDays} Hari
                   </div>
                 </td>
                 <td className="px-4 py-3 text-center">
