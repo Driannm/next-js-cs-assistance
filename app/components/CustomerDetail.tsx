@@ -10,20 +10,14 @@ import {
 interface CustomerDetailProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  customer: any;
+  customer: any; // Menggunakan 'any' sementara, idealnya pakai Type Prisma
 }
 
 export default function CustomerDetail({ open, onOpenChange, customer }: CustomerDetailProps) {
   if (!customer) return null;
 
-  // Simulasi data jadwal (karena di dummy data parent belum tentu lengkap)
-  const dummySchedule = [
-    { day: "Senin", date: "20 Nov", menu: customer.lastMenu || "Ayam Bakar", status: "Terkirim" },
-    { day: "Selasa", date: "21 Nov", menu: "Beef Teriyaki", status: "Proses" },
-    { day: "Rabu", date: "22 Nov", menu: "Ikan Asam Manis", status: "Pending" },
-    { day: "Kamis", date: "23 Nov", menu: "-", status: "Belum Pilih" },
-    { day: "Jumat", date: "24 Nov", menu: "Skip", status: "Libur" },
-  ];
+  // Hitung sisa hari
+  const remainingDays = customer.totalDays - customer.usedDays;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -56,8 +50,8 @@ export default function CustomerDetail({ open, onOpenChange, customer }: Custome
                     <Package className="w-3.5 h-3.5 text-pink-400" />
                     <span className="text-[10px] text-gray-400 uppercase font-bold">Paket</span>
                 </div>
-                <span className="text-sm font-bold text-gray-800 leading-tight block">
-                  {customer.package}
+                <span className="text-sm font-bold text-gray-800 leading-tight block truncate">
+                  {customer.packageType}
                 </span>
              </div>
              <div className="bg-white p-3 rounded-xl border border-pink-100 shadow-sm">
@@ -66,44 +60,21 @@ export default function CustomerDetail({ open, onOpenChange, customer }: Custome
                     <span className="text-[10px] text-gray-400 uppercase font-bold">Sisa Hari</span>
                 </div>
                 <span className="text-sm font-bold text-gray-800 leading-tight block">
-                   {customer.progress.total - customer.progress.current} Hari Lagi
+                   {remainingDays} Hari Lagi
                 </span>
              </div>
           </div>
         </div>
 
-        {/* Body Content (Scrollable) */}
+        {/* Body Content */}
         <div className="flex-1 overflow-y-auto bg-white px-6 py-6">
           <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
             <CalendarDays className="w-4 h-4 text-pink-500" />
-            Jadwal Minggu Ini
+            Riwayat Pesanan
           </h3>
-
-          <div className="space-y-0 relative border-l border-gray-100 ml-2">
-            {dummySchedule.map((item, idx) => (
-              <div key={idx} className="mb-6 ml-6 relative">
-                {/* Dot Connector */}
-                <div className={`absolute -left-[31px] top-1.5 w-3 h-3 rounded-full border-2 border-white ${
-                    item.status === 'Terkirim' ? 'bg-pink-400' : 'bg-gray-300'
-                }`} />
-                
-                <div className="flex justify-between items-start">
-                    <div>
-                        <span className="text-xs text-gray-400 font-medium block mb-0.5">{item.day}, {item.date}</span>
-                        <span className={`text-sm font-bold block ${item.menu === 'Skip' ? 'text-red-400 italic' : 'text-gray-800'}`}>
-                            {item.menu}
-                        </span>
-                    </div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                        item.status === 'Terkirim' ? 'bg-green-100 text-green-600' :
-                        item.status === 'Proses' ? 'bg-yellow-100 text-yellow-600' : 
-                        'bg-gray-100 text-gray-400'
-                    }`}>
-                        {item.status}
-                    </span>
-                </div>
-              </div>
-            ))}
+            
+          <div className="text-center py-10 border-2 border-dashed border-gray-100 rounded-xl">
+             <p className="text-xs text-gray-400">Belum ada history pesanan</p>
           </div>
         </div>
       </SheetContent>
