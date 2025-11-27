@@ -122,20 +122,25 @@ export default function MenuDetail({
             </div>
 
             <div>
-              <h3 className="text-sm font-bold text-gray-800 mb-3">
-                Isi Menu
-              </h3>
+              <h3 className="text-sm font-bold text-gray-800 mb-3">Isi Menu</h3>
 
               <div className="flex flex-wrap gap-2">
-                {menu.ingredients ? (
-                  menu.ingredients.split(",").map((ing: string, i: number) => (
-                    <span
-                      key={i}
-                      className="text-xs font-medium text-pink-400 bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200"
-                    >
-                      {ing.trim()}
-                    </span>
-                  ))
+                {menu.composition ? (
+                  // pastikan jadi array: split kalau string, atau pakai langsung kalau sudah array
+                  (Array.isArray(menu.composition)
+                    ? menu.composition
+                    : (menu.composition as string).split(",")
+                  )
+                    .map((ing: string, i: number) => ing.trim()) // trim dulu
+                    .filter((ing: string) => ing.length > 0) // buang kosong
+                    .map((ing: string, i: number) => (
+                      <span
+                        key={i}
+                        className="text-xs font-medium text-pink-400 bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200"
+                      >
+                        {ing}
+                      </span>
+                    ))
                 ) : (
                   <span className="text-xs text-gray-400 italic">
                     Data komposisi belum ditambahkan.

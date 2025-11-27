@@ -221,7 +221,7 @@ export default function MenuClient({ initialMenus }: { initialMenus: Menu[] }) {
         {filteredMenus.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
             <div className="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Utensils className="w-8 h-8 opacity-30" />
+              <Utensils className="w-8 h-8 opacity-30 text-pink-400" />
             </div>
             <p className="text-sm">Menu tidak ditemukan</p>
           </div>
