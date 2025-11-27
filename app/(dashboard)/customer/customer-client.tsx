@@ -16,6 +16,7 @@ import {
   XCircle,
   LayoutList,
   Trash2,
+  CircleUser,
 } from "lucide-react";
 import {
   Sheet,
@@ -41,8 +42,10 @@ import autoTable from "jspdf-autotable";
 
 export default function CustomerClient({
   initialCustomers,
+  packages,
 }: {
   initialCustomers: any[];
+  packages: any[];
 }) {
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<"card" | "table">("card");
@@ -51,7 +54,11 @@ export default function CustomerClient({
   >("all");
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<{
+    id: string;
+    name: string;
+    duration: number;
+  } | null>(null);
 
   // Filter Logic
   const filteredCustomers = initialCustomers.filter((c) => {
@@ -160,48 +167,58 @@ export default function CustomerClient({
                     placeholder="Catatan Khusus"
                   />
                 </div>
-                <div className="flex gap-3 items-center">
-                  {/* Dropdown Paket */}
+                <div className="flex gap-3">
+                  <input
+                    name="preferences"
+                    type="text"
+                    className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm"
+                    placeholder="Preferensi (Cth: Nasi Merah)"
+                  />
+                  <input
+                    name="allergies"
+                    type="text"
+                    className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm"
+                    placeholder="Alergi (Cth: Udang)"
+                  />
+                </div>
+
+                {/* DROPDOWN PAKET (DARI DATABASE) */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-gray-500 ml-1">
+                    Pilih Paket Langganan
+                  </label>
+
+                  {/* Hidden input supaya form tetap kirim packageId */}
+                  <input
+                    type="hidden"
+                    name="packageId"
+                    value={selectedPackage?.id || ""}
+                  />
+
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
                         type="button"
                         className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-left text-sm flex justify-between items-center"
                       >
-                        {selectedPackage || "Pilih Paket"}
+                        {selectedPackage
+                          ? `${selectedPackage.name} (${selectedPackage.duration} Hari)`
+                          : "Pilih Paket"}
                         <span className="opacity-50 text-xs">▼</span>
                       </button>
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent className="w-[200px]">
-                      <DropdownMenuItem
-                        onClick={() => setSelectedPackage("Healthy Slimming")}
-                      >
-                        Healthy Slimming
-                      </DropdownMenuItem>
-
-                      <DropdownMenuItem
-                        onClick={() => setSelectedPackage("Muscle Gain")}
-                      >
-                        Muscle Gain
-                      </DropdownMenuItem>
-
-                      <DropdownMenuItem
-                        onClick={() => setSelectedPackage("Trial")}
-                      >
-                        Trial 3 Hari
-                      </DropdownMenuItem>
+                    <DropdownMenuContent className="w-[240px]">
+                      {packages.map((pkg) => (
+                        <DropdownMenuItem
+                          key={pkg.id}
+                          onClick={() => setSelectedPackage(pkg)}
+                        >
+                          {pkg.name} — {pkg.duration} Hari
+                        </DropdownMenuItem>
+                      ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
-
-                  {/* Input Total Hari */}
-                  <input
-                    name="totalDays"
-                    type="number"
-                    defaultValue={10}
-                    className="w-20 p-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-pink-400 text-center"
-                    placeholder="Hari"
-                  />
                 </div>
 
                 <button
@@ -301,8 +318,11 @@ export default function CustomerClient({
       <div className="px-5 py-4">
         {filteredCustomers.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
-            <p className="text-sm">Belum ada data pelanggan.</p>
+          <div className="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CircleUser className="w-8 h-8 opacity-30 text-pink-400" />
           </div>
+          <p className="text-sm">Belum ada data pelanggan</p>
+        </div>
         ) : viewMode === "card" ? (
           // CARD VIEW
           <div className="space-y-4">

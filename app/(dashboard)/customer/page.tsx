@@ -1,16 +1,20 @@
 import { prisma } from "@/lib/prisma";
 import CustomerClient from "./customer-client";
 
-// Agar data selalu update saat dibuka
 export const dynamic = "force-dynamic";
 
 export default async function CustomerPage() {
-  // Ambil data pelanggan dari database
   const customers = await prisma.customer.findMany({
-    orderBy: {
-      createdAt: 'desc',
-    },
+    orderBy: { createdAt: 'desc' },
+    include: { 
+      package: true // <--- WAJIB ADA: Agar kita bisa akses customer.package.name
+    } 
   });
 
-  return <CustomerClient initialCustomers={customers} />;
+  // Ambil data packages untuk dropdown di form tambah
+  const packages = await prisma.package.findMany({
+    orderBy: { duration: 'asc' }
+  });
+
+  return <CustomerClient initialCustomers={customers} packages={packages} />;
 }
