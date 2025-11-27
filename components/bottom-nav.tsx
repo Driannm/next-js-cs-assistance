@@ -38,7 +38,6 @@ export default function BottomNav() {
 
   const moreMenu = [
     { name: "Settings", href: "/settings", icon: Settings },
-    { name: "Notifications", href: "/notifications", icon: Bell },
     { name: "Account", href: "/account", icon: UserCog },
   ];
 
