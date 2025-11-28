@@ -28,9 +28,10 @@ export default function CustomerClient({
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   // Filter Logic
-  const filteredCustomers = initialCustomers.filter((c) => {
+  const filteredCustomers = initialCustomers.filter((c: any) => {
     const matchSearch = c.name.toLowerCase().includes(search.toLowerCase());
-    const matchFilter = filterStatus === "all" ? true : c.status === filterStatus;
+    const matchFilter =
+      filterStatus === "all" ? true : c.status === filterStatus;
     return matchSearch && matchFilter;
   });
 
