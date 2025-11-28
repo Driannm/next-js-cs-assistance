@@ -90,7 +90,11 @@ model Menu {
 model Order {
   id          String   @id @default(cuid())
   date        DateTime
-  status      String   @default("pending")
+  
+  // PERUBAHAN DISINI: Tambah Session
+  session     String   @default("LUNCH") // "LUNCH" atau "DINNER"
+  
+  status      String   @default("pending") // pending, cooking, sent
   note        String?
 
   customerId  String
@@ -102,5 +106,6 @@ model Order {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@unique([customerId, date]) 
+  // Constraint berubah: Unik berdasarkan Customer + Tanggal + Sesi
+  @@unique([customerId, date, session]) 
 }
