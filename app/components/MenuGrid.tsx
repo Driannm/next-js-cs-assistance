@@ -63,7 +63,7 @@ export default function MenuGrid({ menus, onSelect }: MenuGridProps) {
               </div>
               <div className="flex items-center gap-1 text-[10px] font-semibold text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">
                 <span className="text-[9px]">PRO</span>
-                {menu.protein || "0g"}
+                {`${menu?.protein ?? 0}g`}
               </div>
             </div>
           </div>

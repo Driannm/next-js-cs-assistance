@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Utensils } from "lucide-react";
 import { SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
@@ -8,6 +9,35 @@ interface MenuFormProps {
 }
 
 export default function MenuForm({ onSubmit }: MenuFormProps) {
+  const [file, setFile] = useState<File | null>(null);
+
+  // Upload ke /api/upload
+  async function uploadImage(file: File) {
+    const fd = new FormData();
+    fd.append("file", file);
+
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: fd,
+    });
+
+    const json = await res.json();
+    return json.url; // URL file setelah upload
+  }
+
+  // Wrapper untuk form
+  async function handleForm(formData: FormData) {
+    let imageUrl = "/uploads/default.jpg";
+
+    if (file) {
+      imageUrl = await uploadImage(file);
+    }
+
+    formData.append("image", imageUrl);
+
+    await onSubmit(formData); // eksekusi server action
+  }
+
   return (
     <SheetContent side="bottom" className="rounded-t-3xl pb-10 h-[85vh] px-5">
       <SheetHeader className="mb-5">
@@ -15,16 +45,23 @@ export default function MenuForm({ onSubmit }: MenuFormProps) {
       </SheetHeader>
 
       <form
-        action={onSubmit}
+        action={handleForm}
         className="space-y-4 overflow-y-auto max-h-[70vh] px-1"
       >
-        {/* Image Placeholder */}
-        <div className="h-40 w-full bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400">
+        {/* Image Upload */}
+        <label className="h-40 w-full bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 cursor-pointer">
           <Utensils className="w-8 h-8 mb-2" />
-          <span className="text-xs">Upload Foto (Auto Default)</span>
-        </div>
+          <span className="text-xs">Upload Foto</span>
 
-        {/* Input Fields */}
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          />
+        </label>
+
+        {/* Nama Menu */}
         <div>
           <label className="text-xs font-medium text-gray-500">Nama Menu</label>
           <input
@@ -36,7 +73,7 @@ export default function MenuForm({ onSubmit }: MenuFormProps) {
           />
         </div>
 
-        {/* Dropdown Category */}
+        {/* Category */}
         <div>
           <label className="text-xs font-medium text-gray-500">Kategori</label>
           <select
@@ -49,6 +86,7 @@ export default function MenuForm({ onSubmit }: MenuFormProps) {
           </select>
         </div>
 
+        {/* Nutrition */}
         <div className="flex gap-4">
           <div className="flex-1">
             <label className="text-xs font-medium text-gray-500">
@@ -61,6 +99,7 @@ export default function MenuForm({ onSubmit }: MenuFormProps) {
               placeholder="400"
             />
           </div>
+
           <div className="flex-1">
             <label className="text-xs font-medium text-gray-500">
               Protein (gr)
@@ -72,6 +111,7 @@ export default function MenuForm({ onSubmit }: MenuFormProps) {
               placeholder="30g"
             />
           </div>
+
           <div className="flex-1">
             <label className="text-xs font-medium text-gray-500">
               Lemak (fat)
@@ -85,6 +125,7 @@ export default function MenuForm({ onSubmit }: MenuFormProps) {
           </div>
         </div>
 
+        {/* Description */}
         <div>
           <label className="text-xs font-medium text-gray-500">Deskripsi</label>
           <textarea
