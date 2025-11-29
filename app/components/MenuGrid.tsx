@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Edit3, Flame, Utensils } from "lucide-react";
-import { Menu } from "@/lib/types";
+import { Menu } from "@/lib/menu-types";
 
 interface MenuGridProps {
   menus: Menu[];

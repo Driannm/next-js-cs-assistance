@@ -6,7 +6,7 @@ import MenuDetail from "@/app/components/MenuDetail";
 import { createMenu } from "@/app/actions/menu";
 
 // Import komponen modular
-import { Menu, Category } from "@/lib/types";
+import { Menu, Category } from "@/lib/menu-types";
 import MenuHeader from "@/app/components/MenuHeader";
 import MenuGrid from "@/app/components/MenuGrid";
 

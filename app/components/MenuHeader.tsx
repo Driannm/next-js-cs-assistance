@@ -2,7 +2,7 @@
 
 import { Search, Plus } from "lucide-react";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
-import { Category } from "@/lib/types";
+import { Category } from "@/lib/menu-types";
 import MenuForm from "./MenuForm";
 
 interface MenuHeaderProps {
