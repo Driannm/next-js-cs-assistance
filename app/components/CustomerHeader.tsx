@@ -10,9 +10,24 @@ import {
   FileSpreadsheet,
   FileText,
   Plus,
+  ArrowUpDown, // Icon Sort Umum
+  ArrowUpNarrowWide, // Icon Ascending
+  ArrowDownWideNarrow, // Icon Descending
+  Clock,
 } from "lucide-react";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import CustomerForm from "./CustomerForm";
+
+// Definisikan tipe sorting biar rapi
+export type SortOrder = "newest" | "remaining_asc" | "remaining_desc";
 
 interface CustomerHeaderProps {
   search: string;
@@ -21,6 +36,11 @@ interface CustomerHeaderProps {
   setViewMode: (val: "card" | "table") => void;
   filterStatus: "all" | "active" | "expired";
   setFilterStatus: (val: "all" | "active" | "expired") => void;
+  
+  // --- PROPS BARU UNTUK SORTING ---
+  sortOrder: SortOrder;
+  setSortOrder: (val: SortOrder) => void;
+  
   onExportExcel: () => void;
   onExportPDF: () => void;
   isSheetOpen: boolean;
@@ -36,6 +56,8 @@ export default function CustomerHeader({
   setViewMode,
   filterStatus,
   setFilterStatus,
+  sortOrder,      // Baru
+  setSortOrder,   // Baru
   onExportExcel,
   onExportPDF,
   isSheetOpen,
@@ -94,9 +116,10 @@ export default function CustomerHeader({
         </div>
       </div>
 
-      {/* FILTER & EXPORT */}
+      {/* FILTER, SORT & EXPORT */}
       <div className="flex justify-between items-center">
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide items-center">
+          {/* Status Filters */}
           {[
             { id: "all", label: "Semua", icon: LayoutList },
             { id: "active", label: "Aktif", icon: CheckCircle2 },
@@ -119,6 +142,42 @@ export default function CustomerHeader({
               </button>
             );
           })}
+
+          {/* Separator Kecil */}
+          <div className="w-px h-6 bg-gray-200 mx-1 shrink-0" />
+
+          {/* --- TOMBOL SORTING (BARU) --- */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-all ${
+                  sortOrder !== 'newest' 
+                  ? "bg-pink-50 border-pink-200 text-pink-600" 
+                  : "bg-white text-gray-600 border-gray-200"
+              }`}>
+                {sortOrder === 'remaining_asc' && <ArrowUpNarrowWide className="w-3.5 h-3.5" />}
+                {sortOrder === 'remaining_desc' && <ArrowDownWideNarrow className="w-3.5 h-3.5" />}
+                {sortOrder === 'newest' && <ArrowUpDown className="w-3.5 h-3.5" />}
+                Urutkan
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuLabel className="text-xs text-gray-500">Urutkan Sisa Hari</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setSortOrder("remaining_asc")}>
+                <ArrowUpNarrowWide className="w-4 h-4 mr-2 text-orange-500" />
+                <span>Sedikit → Banyak</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortOrder("remaining_desc")}>
+                <ArrowDownWideNarrow className="w-4 h-4 mr-2 text-green-500" />
+                <span>Banyak → Sedikit</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setSortOrder("newest")}>
+                <Clock className="w-4 h-4 mr-2 text-gray-500" />
+                <span>Terbaru Ditambahkan</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {viewMode === "table" && (

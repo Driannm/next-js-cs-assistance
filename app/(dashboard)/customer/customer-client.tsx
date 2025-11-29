@@ -13,6 +13,7 @@ import CustomerDetail from "@/app/components/CustomerDetail";
 // Actions & Utils
 import { createCustomer, deleteCustomer } from "@/app/actions/customer";
 import { exportToExcel, exportToPDF } from "@/lib/export-helpers";
+import { SortOrder } from "@/app/components/CustomerHeader";
 
 export default function CustomerClient({
   initialCustomers,
@@ -26,13 +27,31 @@ export default function CustomerClient({
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "expired">("all");
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
 
   // Filter Logic
-  const filteredCustomers = initialCustomers.filter((c: any) => {
+  const filteredCustomers = initialCustomers
+  .filter((c: any) => {
     const matchSearch = c.name.toLowerCase().includes(search.toLowerCase());
-    const matchFilter =
-      filterStatus === "all" ? true : c.status === filterStatus;
+    const matchFilter = filterStatus === "all" ? true : c.status === filterStatus;
     return matchSearch && matchFilter;
+  })
+  .sort((a: any, b: any) => {
+    // Hitung sisa hari (Total - Used)
+    // Pastikan ada validasi jika package null
+    const remainingA = (a.package?.duration || 0) - a.usedDays;
+    const remainingB = (b.package?.duration || 0) - b.usedDays;
+
+    if (sortOrder === "remaining_asc") {
+      // Sedikit ke Banyak (Ascending)
+      return remainingA - remainingB;
+    } else if (sortOrder === "remaining_desc") {
+      // Banyak ke Sedikit (Descending)
+      return remainingB - remainingA;
+    } else {
+      // Newest (Default: CreatedAt Descending)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
   });
 
   // Action Handlers
@@ -62,6 +81,8 @@ export default function CustomerClient({
         setIsSheetOpen={setIsSheetOpen}
         onCreateCustomer={handleCreate}
         packages={packages}
+        sortOrder={sortOrder}        // Props baru
+        setSortOrder={setSortOrder}
       />
 
       <div className="px-5 py-4">
