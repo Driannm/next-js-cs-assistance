@@ -2,7 +2,7 @@ export interface Order {
     customerId: string;
     customerName: string;
     address: string;
-    status: string; // "pending" | "cooking" | "sent"
+    status: string;
     menuName?: string;
     menuId?: string;
     note?: string;
@@ -12,4 +12,5 @@ export interface Order {
   export interface Menu {
     id: string;
     name: string;
+    category: string;
   }
