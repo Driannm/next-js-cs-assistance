@@ -1,7 +1,7 @@
 "use client";
 
 import { MapPin, AlertCircle, CheckSquare, Square } from "lucide-react";
-import { Order } from "../types";
+import { Order } from "@/lib/order-types";
 
 interface OrderCardProps {
   order: Order;
